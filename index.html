@@ -1,380 +1,436 @@
-
+```html
 <!DOCTYPE html>
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎰 Emoji Spin</title>
+<title>Moments</title>
+
 <style>
-:root {
-  --pink:#ff2d95; --purple:#8b5cf6; --cyan:#00e5ff;
-  --green:#39ff88; --gold:#ffd700; --bg:#100824;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
-*{box-sizing:border-box}
-body{
-  margin:0;min-height:100vh;padding:25px 15px;
-  display:flex;justify-content:center;align-items:center;
-  font-family:Arial,sans-serif;color:white;overflow-x:hidden;
-  background:
-    radial-gradient(ellipse at 15% 15%,#8b5cf650,transparent 40%),
-    radial-gradient(ellipse at 85% 80%,#ff2d9530,transparent 40%),
-    var(--bg);
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #101827, #172d38, #102a25);
+    color: white;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
-body:before{
-  content:"";position:fixed;inset:0;pointer-events:none;
-  background-image:radial-gradient(#ffffff50 1px,transparent 1px);
-  background-size:37px 37px;opacity:.2;
-  animation:stars 25s linear infinite;
+
+/* ASOSIY TUZILISH */
+.container {
+    display: flex;
+    min-height: 100vh;
 }
-@keyframes stars{to{transform:translate(37px,37px)}}
-.app{width:100%;max-width:700px;position:relative}
-header{text-align:center;margin-bottom:25px}
-.logo{
-  font-size:clamp(35px,8vw,65px);font-weight:1000;
-  letter-spacing:2px;margin:10px 0;
-  background:linear-gradient(90deg,#fff,var(--pink),var(--cyan),#fff);
-  background-size:250%;color:transparent;
-  background-clip:text;-webkit-background-clip:text;
-  filter:drop-shadow(0 0 20px #bd66ff65);
-  animation:logoGlow 4s linear infinite;
+
+/* CHAP MENYU */
+.sidebar {
+    width: 250px;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(15px);
+    padding: 35px 20px;
+    border-right: 1px solid rgba(255,255,255,0.1);
 }
-@keyframes logoGlow{to{background-position:250% center}}
-.subtitle{color:#c9bce4;font-size:14px;line-height:1.6}
-.badge{
-  display:inline-block;padding:9px 15px;border:1px solid #ff2d9560;
-  border-radius:30px;background:#ff2d9515;color:#ffacd7;
-  font-size:11px;font-weight:bold;letter-spacing:2px;
+
+.logo {
+    font-size: 27px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 55px;
+    letter-spacing: 3px;
+    color: #4ade80;
 }
-.machine{
-  position:relative;padding:25px;
-  border-radius:30px;
-  background:linear-gradient(145deg,#ffffff18,#ffffff04,#8b5cf625);
-  border:1px solid #ffffff30;
-  box-shadow:0 25px 80px #0008,0 0 35px #8b5cf630;
-  overflow:hidden;
+
+.menu button {
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    color: white;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.3s;
 }
-.machine:before{
-  content:"";position:absolute;inset:0;padding:2px;border-radius:30px;
-  background:linear-gradient(135deg,var(--pink),var(--purple),var(--cyan),var(--green),var(--pink));
-  background-size:300% 300%;animation:borderMove 6s linear infinite;
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+
+.menu button:hover,
+.menu button.active {
+    background: #16a34a;
+    transform: translateX(5px);
 }
-@keyframes borderMove{to{background-position:300% 0}}
-.lights{display:flex;justify-content:center;gap:12px;margin-bottom:24px}
-.light{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 15px var(--gold);animation:blink .7s infinite alternate}
-.light:nth-child(even){background:var(--pink);box-shadow:0 0 15px var(--pink);animation-delay:.3s}
-@keyframes blink{to{opacity:.3;transform:scale(.7)}}
-.label{display:flex;justify-content:space-between;gap:10px;font-size:11px;font-weight:bold;letter-spacing:1px;color:#c9bce4;margin-bottom:14px}
-.slot{
-  padding:12px;border-radius:22px;
-  background:linear-gradient(145deg,#090414,#281348,#0a0617);
-  box-shadow:inset 0 0 25px #0009,0 0 30px #8b5cf625;
+
+/* O'NG TOMON */
+.main {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.reels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.reel{
-  height:clamp(100px,22vw,150px);display:grid;place-items:center;
-  border:1px solid #bda9ff55;border-radius:17px;
-  background:linear-gradient(145deg,#382057,#160d2b);
-  box-shadow:inset 0 0 20px #0007,inset 0 1px 0 #ffffff20;
-  font-size:clamp(43px,10vw,76px);overflow:hidden;
-  transition:.3s;
+
+/* SAHIFALAR */
+.page {
+    display: none;
+    width: 100%;
+    max-width: 900px;
+    text-align: center;
+    animation: fade 0.5s ease;
 }
-.reel.spinning .emoji{animation:spinEmoji .09s linear infinite}
-@keyframes spinEmoji{
-  0%{transform:translateY(-22px);filter:blur(2px)}
-  100%{transform:translateY(22px);filter:blur(2px)}
+
+.page.active {
+    display: block;
 }
-.reel.winner{
-  border-color:var(--green);
-  box-shadow:inset 0 0 30px #39ff8840,0 0 30px #39ff8880;
-  animation:winning .5s infinite alternate;
+
+@keyframes fade {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-@keyframes winning{to{transform:scale(1.035);filter:brightness(1.3)}}
-.reel.loser{animation:shake .25s}
-@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-.actions{text-align:center;margin-top:24px}
-button{font-family:inherit;cursor:pointer;color:white;font-weight:900;border:0;transition:transform .2s,filter .2s}
-.start{
-  position:relative;overflow:hidden;width:min(100%,390px);padding:19px;
-  font-size:16px;border-radius:17px;
-  background:linear-gradient(100deg,var(--pink),var(--purple),#5946ed);
-  box-shadow:0 8px 0 #42218a,0 15px 35px #a855f755;
-  animation:pulse 2s infinite;
+
+/* BOSHLASH TUGMASI */
+.start-btn {
+    padding: 24px 75px;
+    border: none;
+    border-radius: 18px;
+    background: #16a34a;
+    color: white;
+    font-size: 27px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    cursor: pointer;
+    box-shadow: 0 10px 35px rgba(22,163,74,0.4);
+    transition: 0.3s;
 }
-@keyframes pulse{50%{filter:brightness(1.2);box-shadow:0 8px 0 #42218a,0 15px 45px #c026d380}}
-button:hover{filter:brightness(1.15);transform:translateY(-2px)}
-button:active{transform:translateY(2px)}
-button:disabled{opacity:.65;cursor:wait;animation:none}
-.status{min-height:65px;margin-top:22px;display:flex;flex-direction:column;justify-content:center;gap:7px}
-.status-title{font-size:clamp(17px,4vw,23px);font-weight:900}
-.status-sub{font-size:12px;color:#b9acd5;line-height:1.5}
-.status.win .status-title{color:var(--green);text-shadow:0 0 20px #39ff8870;animation:pop .5s}
-.status.lose .status-title{color:#ffacd7}
-@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
-.gift-btn{
-  display:none;width:min(100%,390px);padding:18px;margin-top:14px;
-  font-size:15px;border-radius:16px;
-  background:linear-gradient(100deg,#ffe35b,#ff9800,#ff3989);
-  box-shadow:0 7px 0 #984311,0 12px 35px #ffb21f45;
+
+.start-btn:hover {
+    transform: scale(1.07);
+    background: #15803d;
 }
-.gift-btn.show{display:inline-block;animation:pop .6s}
-.stats{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:22px}
-.stat{padding:10px 14px;border-radius:12px;background:#ffffff0b;border:1px solid #ffffff18;color:#c7b9df;font-size:12px}
-.stat b{color:white;margin-left:5px}
-.note{text-align:center;font-size:11px;color:#85759f;line-height:1.6;margin:20px auto 0}
-.footer{text-align:center;margin-top:22px;font-size:10px;color:#68597f;letter-spacing:2px}
-.backdrop{
-  position:fixed;inset:0;z-index:10;padding:18px;
-  display:flex;align-items:center;justify-content:center;
-  background:#070311d9;backdrop-filter:blur(12px);
-  opacity:0;visibility:hidden;transition:.35s;
+
+.start-btn:disabled {
+    background: #dc2626;
+    cursor: default;
+    transform: scale(1);
+    box-shadow: 0 10px 35px rgba(220,38,38,0.4);
 }
-.backdrop.open{opacity:1;visibility:visible}
-.modal{
-  width:min(100%,470px);max-height:90vh;overflow:auto;
-  position:relative;text-align:center;padding:28px;
-  border-radius:27px;border:1px solid #ffd70065;
-  background:radial-gradient(ellipse at top,#543321,#25113e 55%,#120a25);
-  box-shadow:0 0 70px #ffb81f35,0 25px 80px #000b;
-  transform:translateY(30px) scale(.85);
-  transition:transform .65s cubic-bezier(.16,1.25,.3,1);
+
+/* SANOQ */
+.countdown {
+    font-size: 130px;
+    font-weight: bold;
+    color: #4ade80;
+    margin-top: 35px;
+    display: none;
+    text-shadow: 0 0 35px rgba(74,222,128,0.7);
 }
-.backdrop.open .modal{transform:translateY(0) scale(1)}
-.close{
-  position:absolute;right:12px;top:12px;width:35px;height:35px;
-  border-radius:11px;background:#ffffff15;border:1px solid #ffffff30;font-size:22px;
+
+.countdown.show {
+    display: block;
+    animation: countAnimation 0.8s ease;
 }
-.kicker{font-size:11px;letter-spacing:3px;color:var(--gold);font-weight:bold}
-.modal h2{color:#ffe68b;font-size:30px;margin:14px 0 8px}
-.modal p{font-size:13px;color:#d0c2e9;line-height:1.5}
-.gift-frame{
-  min-height:190px;padding:12px;display:grid;place-items:center;
-  border-radius:20px;border:1px solid #ffd70035;
-  background:#ffd70008;position:relative;overflow:hidden;
+
+@keyframes countAnimation {
+    0% { transform: scale(2); opacity: 0; }
+    50% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
 }
-.gift-frame:before{
-  content:"";position:absolute;width:180px;height:180px;border-radius:50%;
-  background:#ffd70035;filter:blur(45px);
+
+/* MUSIQA HOLATI */
+.music-status {
+    margin-top: 30px;
+    font-size: 19px;
+    color: #4ade80;
+    display: none;
 }
-#giftImage{
-  display:none;position:relative;z-index:1;max-width:100%;max-height:45vh;
-  object-fit:contain;border-radius:12px;
-  opacity:0;transform:scale(.7) translateY(20px);
-  transition:opacity 1.3s,transform 1.3s cubic-bezier(.16,1.3,.3,1);
+
+.music-status.show {
+    display: block;
 }
-.backdrop.revealed #giftImage{opacity:1;transform:scale(1) translateY(0)}
-#fallbackGift{position:relative;z-index:1;font-size:85px;animation:floatGift 2s infinite ease-in-out}
-@keyframes floatGift{50%{transform:translateY(-9px) rotate(4deg)}}
-.close-bottom{margin-top:20px;padding:13px 22px;border-radius:12px;background:#ffffff16;border:1px solid #ffffff2c}
-#confetti{position:fixed;inset:0;z-index:15;pointer-events:none;overflow:hidden}
-.confetti-piece{position:absolute;top:-20px;width:9px;height:14px;border-radius:2px;animation:fall var(--duration) linear forwards}
-@keyframes fall{to{transform:translate(var(--drift),110vh) rotate(850deg);opacity:.2}}
-@media(max-width:480px){
- body{padding:18px 11px;align-items:flex-start}
- .machine{padding:16px 12px;border-radius:24px}
- .slot{padding:8px;border-radius:17px}
- .reels{gap:7px}.reel{height:clamp(90px,27vw,120px);border-radius:12px}
- .modal{padding:25px 18px}
+
+/* RASMLAR */
+.page img {
+    display: block;
+    max-width: 100%;
+    max-height: 65vh;
+    object-fit: contain;
+    margin: 25px auto;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
 }
-@media(prefers-reduced-motion:reduce){
- *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+
+.page-title {
+    font-size: 32px;
+    color: #4ade80;
+    margin-bottom: 20px;
+}
+
+/* MUSIQA BOSHQARUVI */
+.music-controls {
+    margin-top: 25px;
+}
+
+.music-controls button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    background: #16a34a;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.music-controls button:hover {
+    background: #15803d;
+}
+
+/* TELEFON */
+@media(max-width: 700px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .logo {
+        margin-bottom: 15px;
+    }
+
+    .menu {
+        display: flex;
+        gap: 5px;
+    }
+
+    .menu button {
+        text-align: center;
+        padding: 12px 5px;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .main {
+        padding: 25px 15px;
+        min-height: 65vh;
+    }
+
+    .start-btn {
+        padding: 20px 45px;
+        font-size: 22px;
+    }
+
+    .countdown {
+        font-size: 100px;
+    }
 }
 </style>
 </head>
+
 <body>
-<main class="app">
-  <header>
-    <div class="badge">✦ OMADINGNI SINAB KO‘R ✦</div>
-    <div class="logo">🎰 EMOJI SPIN</div>
-    <p class="subtitle">Uchta belgini aylantir, bir xil emojilarni top va sovg‘angni och!</p>
-  </header>
 
-  <section class="machine">
-    <div class="lights">
-      <span class="light"></span><span class="light"></span><span class="light"></span>
-      <span class="light"></span><span class="light"></span><span class="light"></span>
-      <span class="light"></span><span class="light"></span><span class="light"></span>
-    </div>
-    <div class="label"><span>🟢 SPIN MACHINE</span><span>3 REELS · 4 SECONDS</span></div>
-    <div class="slot">
-      <div class="reels">
-        <div class="reel" id="reel0"><span class="emoji" id="emoji0">🍒</span></div>
-        <div class="reel" id="reel1"><span class="emoji" id="emoji1">💎</span></div>
-        <div class="reel" id="reel2"><span class="emoji" id="emoji2">⭐</span></div>
-      </div>
-    </div>
-    <div class="actions">
-      <button class="start" id="spinBtn">🎰 O‘YINNI BOSHLASH</button>
-      <div class="status" id="status" aria-live="polite">
-        <div class="status-title">Omad seni kutmoqda!</div>
-        <div class="status-sub">Boshlash tugmasini bos va aylanishni boshlagin.</div>
-      </div>
-      <button class="gift-btn" id="giftBtn">🎁 SOVG‘ANI OLISH UCHUN BOSING</button>
-    </div>
-    <div class="stats">
-      <div class="stat">Urinishlar <b id="attempts">0</b></div>
-      <div class="stat">G‘alabalar <b id="wins">0</b></div>
-      <div class="stat">Keyingi spin <b id="nextSpin">#1</b></div>
-    </div>
-  </section>
+<div class="container">
 
-  <p class="note">Bu ko‘ngilochar demo o‘yin. Haqiqiy pul tikish yoki pul yutug‘i mavjud emas.</p>
-  <div class="footer">MADE TO SPIN ✦ BUILT FOR FUN</div>
-</main>
+    <!-- CHAP MENYU -->
+    <aside class="sidebar">
 
-<div class="backdrop" id="giftModal" role="dialog" aria-modal="true" aria-labelledby="giftTitle">
-  <div class="modal">
-    <button class="close" id="closeModal" aria-label="Yopish">×</button>
-    <div class="kicker">✦ MAXSUS MUKOFOT ✦</div>
-    <h2 id="giftTitle">SEN YUTDING!</h2>
-    <p>Sovg‘ang ochilmoqda…</p>
-    <div class="gift-frame">
-      <!-- SOVG'A RASMINI SHU YERGA JOYLASHTIRING -->
-      <!-- Rasmni images/sovga.png nomi bilan saqlang yoki src manzilini o'zgartiring. -->
-      <img id="giftImage" src="Skrinshot 2026-10-19 203634.png" alt="Sizning sovg‘angiz">
-      <div id="fallbackGift">🎁</div>
-    </div>
-    <button class="close-bottom" id="closeModalBottom">AJOYIB! YOPISH</button>
-  </div>
+        <div class="logo">MOMENTS</div>
+
+        <div class="menu">
+            <button class="active" onclick="showPage('home', this)">
+                🏠 Asosiy
+            </button>
+
+            <button onclick="showPage('photos', this)">
+                🖼 Rasmlar
+            </button>
+
+            <button onclick="showPage('info', this)">
+                ℹ Ma'lumot
+            </button>
+        </div>
+
+    </aside>
+
+
+    <!-- ASOSIY QISM -->
+    <main class="main">
+
+        <!-- ASOSIY SAHIFA -->
+        <section class="page active" id="home">
+
+            <button class="start-btn" id="startBtn" onclick="startMusic()">
+                BOSHLASH
+            </button>
+
+            <div class="countdown" id="countdown"></div>
+
+            <div class="music-status" id="musicStatus">
+                ♪ Musiqa ijro etilmoqda...
+            </div>
+
+            <div class="music-controls" id="musicControls" style="display:none;">
+                <button onclick="toggleMusic()" id="pauseBtn">
+                    ⏸ Pauza
+                </button>
+            </div>
+
+        </section>
+
+
+        <!-- RASMLAR SAHIFASI -->
+        <section class="page" id="photos">
+
+            <h1 class="page-title">Rasmlar</h1>
+
+            <!-- BU YERGA RASMLAR RASMINI JOYLASHTIR -->
+            <img src="c:\Users\user\Pictures\Screenshots\Skrinshot 2026-10-19 203634.png" alt="Rasmlar sahifasi rasmi">
+
+        </section>
+
+
+        <!-- MA'LUMOT SAHIFASI -->
+        <section class="page" id="info">
+
+            <h1 class="page-title">Ma'lumot</h1>
+
+            <!-- BU YERGA MA'LUMOT RASMINI JOYLASHTIR -->
+            <img src="c:\Users\user\Pictures\Screenshots\Skrinshot 2026-10-19 203634.png" alt="Ma'lumot sahifasi rasmi">
+
+        </section>
+
+    </main>
+
 </div>
-<div id="confetti"></div>
+
+
+<!-- MP3 MUSIQA FAYLI -->
+<!-- O'ZINGNING MP3 FAYLINGNI assets/music.mp3 NOMI BILAN JOYLASHTIR -->
+<audio id="music" src="c:\Users\user\Downloads\ahhhh-girl.mp3" preload="auto"></audio>
+
 
 <script>
-const EMOJIS = ["🍒","🍋","🍇","🍉","🍓","⭐","💎","🔔","🍀","🪙","🎁","👑"];
-const SPIN_DURATION = 4000;
 
-const spinBtn = document.getElementById("spinBtn");
-const giftBtn = document.getElementById("giftBtn");
-const statusBox = document.getElementById("status");
-const modal = document.getElementById("giftModal");
-const giftImage = document.getElementById("giftImage");
-const fallbackGift = document.getElementById("fallbackGift");
-let attempts = 0, wins = 0, spinning = false, giftOpened = false;
-let timers = [], intervals = [];
+// SAHIFALAR O'RTASIDA O'TISH
+function showPage(pageId, button) {
 
-function randomEmoji(){
-  return EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-}
-function setStatus(title, subtitle, type=""){
-  statusBox.className = "status" + (type ? " " + type : "");
-  statusBox.replaceChildren();
-  const t = document.createElement("div");
-  t.className = "status-title"; t.textContent = title;
-  const s = document.createElement("div");
-  s.className = "status-sub"; s.textContent = subtitle;
-  statusBox.append(t,s);
-}
-function clearEffects(){
-  for(let i=0;i<3;i++){
-    document.getElementById("reel"+i).classList.remove("winner","loser","spinning");
-  }
-}
-function clearTimers(){
-  intervals.forEach(clearInterval);
-  timers.forEach(clearTimeout);
-  intervals=[];timers=[];
-}
-function confetti(){
-  const layer=document.getElementById("confetti");
-  layer.replaceChildren();
-  const colors=["#ffd700","#ff2d95","#00e5ff","#39ff88","#b794ff","#ffffff"];
-  for(let i=0;i<100;i++){
-    const piece=document.createElement("span");
-    piece.className="confetti-piece";
-    piece.style.left=Math.random()*100+"%";
-    piece.style.background=colors[Math.floor(Math.random()*colors.length)];
-    piece.style.setProperty("--duration",(1.8+Math.random()*2)+"s");
-    piece.style.setProperty("--drift",(Math.random()*240-120)+"px");
-    piece.style.animationDelay=Math.random()*.4+"s";
-    layer.appendChild(piece);
-  }
-  setTimeout(()=>layer.replaceChildren(),4500);
-}
-function startSpin(){
-  if(spinning)return;
-  spinning=true;attempts++;giftOpened=false;
-  document.getElementById("attempts").textContent=attempts;
-  document.getElementById("nextSpin").textContent="#"+(attempts+1);
-  spinBtn.disabled=true;spinBtn.textContent="✨ AYLANMOQDA...";
-  giftBtn.classList.remove("show");
-  modal.classList.remove("open","revealed");
-  clearEffects();clearTimers();
-  setStatus("G‘ildiraklar aylanmoqda!","4 soniya kut — natija hozir chiqadi…");
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
 
-  // Demo qoidasi: 1-urinish yutqazish, 2-urinish g'alaba, keyin shu tartib.
-  const isWin=attempts%2===0;
-  let result;
-  if(isWin){
-    const same=randomEmoji();
-    result=[same,same,same];
-  }else{
-    const a=randomEmoji();
-    let b=randomEmoji();while(b===a)b=randomEmoji();
-    let c=randomEmoji();while(c===a||c===b)c=randomEmoji();
-    result=[a,b,c];
-  }
+    document.getElementById(pageId).classList.add('active');
 
-  for(let i=0;i<3;i++){
-    const reel=document.getElementById("reel"+i);
-    const emoji=document.getElementById("emoji"+i);
-    reel.classList.add("spinning");
-    const interval=setInterval(()=>emoji.textContent=randomEmoji(),75+i*12);
-    intervals.push(interval);
-    const stopAt=SPIN_DURATION-(2-i)*170;
-    timers.push(setTimeout(()=>{
-      clearInterval(interval);
-      reel.classList.remove("spinning");
-      emoji.textContent=result[i];
-      reel.animate(
-        [{transform:"translateY(-8px) scale(.96)"},{transform:"translateY(0) scale(1)"}],
-        {duration:260,easing:"cubic-bezier(.2,1.4,.4,1)"}
-      );
-    },stopAt));
-  }
+    document.querySelectorAll('.menu button').forEach(btn => {
+        btn.classList.remove('active');
+    });
 
-  timers.push(setTimeout(()=>{
-    spinning=false;spinBtn.disabled=false;spinBtn.textContent="🔄 QAYTA O‘YNASH";
-    clearEffects();
-    if(isWin){
-      wins++;document.getElementById("wins").textContent=wins;
-      for(let i=0;i<3;i++)document.getElementById("reel"+i).classList.add("winner");
-      setStatus("🎉 TABRIKLAYMIZ, SIZ YUTDINGIZ!","Uchala emoji bir xil! Sovg‘ani ochish vaqti keldi.","win");
-      giftBtn.classList.add("show");confetti();
-    }else{
-      for(let i=0;i<3;i++)document.getElementById("reel"+i).classList.add("loser");
-      setStatus("😢 Afsus, bu safar omad kelmadi!","Yana urinib ko‘r — keyingi urinishda omad sen tomonda.","lose");
+    button.classList.add('active');
+}
+
+
+// BOSHLASH VA SANOQ
+let started = false;
+
+function startMusic() {
+
+    if (started) return;
+
+    started = true;
+
+    const btn = document.getElementById('startBtn');
+    const countdown = document.getElementById('countdown');
+
+    // TUGMA QIZIL RANGGA O'TADI
+    btn.disabled = true;
+    btn.innerText = "BOSHLANDI";
+
+    // 3, 2, 1 SANOQ
+    let number = 3;
+
+    countdown.style.display = "block";
+
+    function count() {
+
+        countdown.innerText = number;
+
+        countdown.classList.remove('show');
+
+        // Animatsiyani qayta ishga tushirish
+        void countdown.offsetWidth;
+
+        countdown.classList.add('show');
+
+        if (number > 1) {
+
+            number--;
+
+            setTimeout(count, 1000);
+
+        } else {
+
+            setTimeout(playMusic, 1000);
+
+        }
     }
-    document.getElementById("nextSpin").textContent="#"+(attempts+1);
-  },SPIN_DURATION));
+
+    count();
 }
-function openGift(){
-  if(spinning||attempts===0||attempts%2!==0||giftOpened)return;
-  giftOpened=true;
-  modal.classList.remove("revealed");
-  modal.classList.add("open");
-  if(giftImage.complete&&giftImage.naturalWidth>0){
-    giftImage.style.display="block";fallbackGift.style.display="none";
-  }else{
-    giftImage.style.display="none";fallbackGift.style.display="block";
-  }
-  setTimeout(()=>modal.classList.add("revealed"),180);
+
+
+// MP3 NI ISHGA TUSHIRISH
+function playMusic() {
+
+    const music = document.getElementById('music');
+
+    document.getElementById('countdown').style.display = "none";
+
+    music.play().then(() => {
+
+        document.getElementById('musicStatus').classList.add('show');
+
+        document.getElementById('musicControls').style.display = "block";
+
+    }).catch(() => {
+
+        alert("MP3 fayl topilmadi yoki ijro etilmadi. assets/music.mp3 manzilini tekshiring.");
+
+        started = false;
+
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('startBtn').innerText = "BOSHLASH";
+
+    });
 }
-function closeGift(){modal.classList.remove("open","revealed")}
-giftImage.addEventListener("error",()=>{
-  giftImage.style.display="none";fallbackGift.style.display="block";
-});
-giftImage.addEventListener("load",()=>{
-  if(giftImage.naturalWidth>0){
-    giftImage.style.display="block";fallbackGift.style.display="none";
-  }
-});
-spinBtn.addEventListener("click",startSpin);
-giftBtn.addEventListener("click",openGift);
-document.getElementById("closeModal").addEventListener("click",closeGift);
-document.getElementById("closeModalBottom").addEventListener("click",closeGift);
-modal.addEventListener("click",e=>{if(e.target===modal)closeGift()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeGift()});
+
+
+// PAUZA VA DAVOM ETTIRISH
+function toggleMusic() {
+
+    const music = document.getElementById('music');
+    const btn = document.getElementById('pauseBtn');
+
+    if (music.paused) {
+
+        music.play();
+
+        btn.innerText = "⏸ Pauza";
+
+    } else {
+
+        music.pause();
+
+        btn.innerText = "▶ Davom ettirish";
+
+    }
+}
+
 </script>
+
 </body>
 </html>
+```
