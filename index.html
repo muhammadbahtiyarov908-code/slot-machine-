@@ -3,671 +3,513 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>SUPER CAR RACING 3D</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Racing</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{overflow:hidden;background:#050914;color:white;font-family:Arial,sans-serif}
-canvas{display:block}
-#hud{position:absolute;top:12px;left:12px;right:12px;display:flex;
-justify-content:space-between;gap:7px;pointer-events:none}
-.info{background:#071426df;border:1px solid #23516d;
-border-radius:12px;padding:9px 13px;backdrop-filter:blur(10px)}
-.info small{font-size:10px;color:#9cb6d0}
-.info strong{display:block;font-size:clamp(16px,3vw,25px);color:#00eaff;margin-top:3px}
-#flyStatus{position:absolute;top:105px;left:50%;transform:translateX(-50%);
-background:#071426dd;padding:9px 18px;border:1px solid #00cfff;
-border-radius:20px;color:#00eaff;font-weight:bold;display:none}
-#overlay{position:absolute;inset:0;z-index:5;display:flex;
-align-items:center;justify-content:center;background:#020715c9;padding:15px}
-.menu{width:min(430px,100%);text-align:center;background:#0b1730;
-border:1px solid #176184;border-radius:22px;padding:28px 22px;
-box-shadow:0 0 50px #00bfff22}
-.menu h1{font-size:clamp(27px,7vw,42px);color:#00eaff;
-text-shadow:0 0 20px #00bfff;margin-bottom:10px}
-.menu p{color:#bdcce0;line-height:1.8;font-size:14px;margin:13px 0 20px}
-button{border:0;border-radius:12px;padding:13px 18px;
-font-weight:bold;font-size:15px;cursor:pointer;touch-action:none}
-.mainbtn{background:linear-gradient(110deg,#00eaff,#147cff);
-color:#00101e;width:100%;font-size:17px}
-#controls{position:absolute;bottom:17px;left:0;right:0;
-display:flex;justify-content:space-between;align-items:end;
-padding:0 13px;pointer-events:none}
-.group{display:flex;gap:9px;align-items:end}
-.ctrl{width:58px;height:58px;background:#10243bdc;
-border:1px solid #00dfff;color:#00eaff;font-size:24px;
-border-radius:15px;pointer-events:auto;user-select:none}
-.ctrl:active{background:#007d9e}
-.ctrl.special{width:68px;height:68px;background:#162a45ee;
-border:2px solid #bd7bff;color:#e2aaff;font-size:23px}
-.ctrl.gas{background:#073b36;color:#39ffb2;border-color:#39ffb2}
-.ctrl.brake{background:#451b24;color:#ff647b;border-color:#ff647b}
-#hint{position:absolute;bottom:92px;left:50%;transform:translateX(-50%);
-font-size:11px;color:#b8c8df;background:#071426bb;padding:7px 12px;
-border-radius:12px;white-space:nowrap;pointer-events:none}
-.hidden{display:none!important}
-@media(max-width:480px){
- .info{padding:7px 9px}
- #controls{padding:0 8px}
- .ctrl{width:51px;height:53px}
- .ctrl.special{width:60px;height:60px}
-}
+*{margin:0;padding:0;box-sizing:border-box}
+body{overflow:hidden;background:#07101c;font-family:Arial,sans-serif;color:white}
+canvas{display:block;width:100vw;height:100vh}
+#hud{position:fixed;top:15px;left:15px;z-index:5;display:flex;gap:10px;flex-wrap:wrap}
+.panel{background:#07101cdd;border:1px solid #ffffff30;padding:10px 15px;border-radius:12px;font-weight:bold}
+#speed{color:#00f5ff;font-size:23px}
+#message{position:fixed;top:25%;left:50%;transform:translateX(-50%);font-size:30px;font-weight:bold;color:#00f5ff;text-shadow:0 0 15px #00f5ff;z-index:5;text-align:center;pointer-events:none}
+#help{position:fixed;top:15px;right:15px;background:#07101cdd;padding:12px;border-radius:12px;font-size:12px;line-height:1.7;z-index:5}
+#controls{position:fixed;bottom:20px;left:0;width:100%;display:flex;justify-content:space-between;padding:0 18px;z-index:10;pointer-events:none}
+.group{display:flex;gap:10px;pointer-events:auto}
+.control{width:62px;height:62px;border-radius:16px;border:1px solid #ffffff66;background:#142b45dd;color:white;font-size:24px;font-weight:bold;touch-action:none;user-select:none}
+.control:active{background:#00a8ff}
+#jump{background:#7b24cddd}
+@media(min-width:850px){#controls{opacity:.65}.control{width:55px;height:55px}}
+@media(max-width:600px){#help{top:auto;bottom:100px;right:10px;font-size:10px}.panel{padding:8px;font-size:12px}#speed{font-size:19px}#message{font-size:24px}}
 </style>
 </head>
 <body>
 
 <div id="hud">
- <div class="info"><small>TEZLIK</small><strong><span id="speed">0</span> <small>KM/H</small></strong></div>
- <div class="info"><small>MASOFA</small><strong><span id="distance">0</span> M</strong></div>
- <div class="info"><small>REKORD</small><strong id="record">0 M</strong></div>
+ <div class="panel">TEZLIK: <span id="speed">0</span> km/h</div>
+ <div class="panel">MASOFA: <span id="distance">0</span> m</div>
+ <div class="panel">REKORD: <span id="record">0</span> m</div>
 </div>
 
-<div id="flyStatus">✈ MAXFLY: <span id="flyTime">60</span> S</div>
-
-<div id="overlay">
- <div class="menu">
-  <h1>🏎️ SUPER CAR</h1>
-  <h2 style="color:#b8c9e5;letter-spacing:5px">RACING 3D</h2>
-  <p>
-   🏁 1000 KM/H gacha tezlik<br>
-   ⬅️ ➡️ — boshqarish<br>
-   W / ↑ — gaz &nbsp; S / ↓ — tormoz<br>
-   SPACE bir marta — sakrash<br>
-   SPACE ikki marta — 60 soniya uchish
-  </p>
-  <button class="mainbtn" id="start">O‘YINNI BOSHLASH</button>
- </div>
+<div id="help">
+ W / ↑ — Gaz<br>
+ S / ↓ — Tormoz<br>
+ A / D — Burilish<br>
+ SPACE — Sakrash<br>
+ SPACE × 2 — Uchish
 </div>
 
-<div id="hint">SPACE × 2 = MAXFLY • 60 soniya</div>
+<div id="message">3D RACING</div>
 
 <div id="controls">
  <div class="group">
-  <button class="ctrl" id="left">◀</button>
-  <button class="ctrl" id="right">▶</button>
+  <button class="control" id="left">←</button>
+  <button class="control" id="right">→</button>
  </div>
  <div class="group">
-  <button class="ctrl special" id="jump">🚀</button>
-  <button class="ctrl brake" id="brake">▼</button>
-  <button class="ctrl gas" id="gas">▲</button>
+  <button class="control" id="jump">↑</button>
+  <button class="control" id="brake">▼</button>
+  <button class="control" id="gas">▲</button>
  </div>
 </div>
 
 <script type="module">
-import * as THREE from
-'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
-// =================================
-// 3D SCENE
-// =================================
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x07101c);
+scene.fog = new THREE.Fog(0x07101c,45,190);
 
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x081326);
-scene.fog=new THREE.Fog(0x081326,45,180);
+const camera = new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,300);
+camera.position.set(0,5.5,11);
+camera.lookAt(0,1,-5);
 
-const camera=new THREE.PerspectiveCamera(
- 65,innerWidth/innerHeight,.1,400
-);
-camera.position.set(0,6,13);
-
-const renderer=new THREE.WebGLRenderer({antialias:true});
+const renderer = new THREE.WebGLRenderer({
+ antialias:false,
+ powerPreference:"high-performance"
+});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.2));
 renderer.setSize(innerWidth,innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
-renderer.shadowMap.enabled=true;
-renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.2;
 document.body.appendChild(renderer.domElement);
 
-// LIGHTING
-scene.add(new THREE.HemisphereLight(0x9ccfff,0x26311d,2.1));
-
-const sun=new THREE.DirectionalLight(0xffffff,2.4);
-sun.position.set(-12,25,15);
-sun.castShadow=true;
-sun.shadow.mapSize.set(1024,1024);
+scene.add(new THREE.HemisphereLight(0xb9dfff,0x202030,2));
+const sun=new THREE.DirectionalLight(0xffffff,1.5);
+sun.position.set(-5,12,8);
 scene.add(sun);
 
-// =================================
-// MATERIALS AND OBJECTS
-// =================================
+// Materiallar
+const roadMat=new THREE.MeshStandardMaterial({color:0x242832,roughness:1});
+const grassMat=new THREE.MeshStandardMaterial({color:0x102b20});
+const whiteMat=new THREE.MeshBasicMaterial({color:0xffffff});
+const darkMat=new THREE.MeshStandardMaterial({color:0x111722});
+const glassMat=new THREE.MeshStandardMaterial({color:0x39a8d9,metalness:.3,roughness:.2});
+const wheelMat=new THREE.MeshStandardMaterial({color:0x080808});
 
-function material(color,metalness=.2,roughness=.5){
- return new THREE.MeshStandardMaterial({
-  color,metalness,roughness
- });
-}
-
-function makeBox(w,h,d,color,x,y,z){
- const mesh=new THREE.Mesh(
-  new THREE.BoxGeometry(w,h,d),material(color)
- );
- mesh.position.set(x,y,z);
- mesh.castShadow=true;
- mesh.receiveShadow=true;
- scene.add(mesh);
- return mesh;
-}
-
-// GROUND
-const ground=new THREE.Mesh(
- new THREE.PlaneGeometry(300,400),
- material(0x142d21)
-);
+// Yer
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(500,500),grassMat);
 ground.rotation.x=-Math.PI/2;
-ground.position.set(0,-.15,-100);
+ground.position.y=-.13;
 scene.add(ground);
 
-// ROAD
-const road=new THREE.Mesh(
- new THREE.PlaneGeometry(13,400),
- material(0x202630,.1,.95)
-);
-road.rotation.x=-Math.PI/2;
-road.position.set(0,-.07,-100);
+// Yo'l
+const road=new THREE.Mesh(new THREE.BoxGeometry(12,.15,300),roadMat);
+road.position.set(0,-.05,-100);
 scene.add(road);
 
-// ROAD EDGES
-makeBox(.2,.06,400,0xffffff,-6.35,-.02,-100);
-makeBox(.2,.06,400,0xffffff,6.35,-.02,-100);
-
-// LANE MARKINGS
-const marks=[];
-for(const x of [-2.1,2.1]){
- for(let i=0;i<35;i++){
-  const m=makeBox(.12,.035,2.8,0xe4eaf2,x,-.015,-i*8);
-  marks.push(m);
- }
+for(const x of [-6,6]){
+ const edge=new THREE.Mesh(new THREE.BoxGeometry(.18,.2,300),whiteMat);
+ edge.position.set(x,.05,-100);
+ scene.add(edge);
 }
 
-// =================================
-// RGB STREET LIGHTS
-// =================================
+// Yo'l chiziqlari
+const laneMarks=[];
+for(let i=0;i<28;i++){
+ const mark=new THREE.Mesh(new THREE.BoxGeometry(.13,.025,3),whiteMat);
+ mark.position.set(0,.045,-i*10);
+ scene.add(mark);
+ laneMarks.push(mark);
+}
 
+// RGB chiroqlar
 const lamps=[];
+const poleMat=new THREE.MeshStandardMaterial({color:0x333b49});
 
-for(let i=0;i<35;i++){
+for(let i=0;i<18;i++){
  for(const side of [-1,1]){
-  const x=side*8;
+  const pole=new THREE.Mesh(new THREE.BoxGeometry(.16,5,.16),poleMat);
+  pole.position.set(side*8,2.5,-i*15);
+  scene.add(pole);
 
-  const pole=makeBox(.14,3.8,.14,0x53647e,x,1.9,-i*9);
-  const arm=makeBox(1.1,.12,.12,0x53647e,x-side*.45,3.7,-i*9);
+  const arm=new THREE.Mesh(new THREE.BoxGeometry(1.5,.13,.13),poleMat);
+  arm.position.set(side*7.3,4.8,-i*15);
+  scene.add(arm);
 
   const bulb=new THREE.Mesh(
-   new THREE.SphereGeometry(.25,24,24),
+   new THREE.SphereGeometry(.35,10,8),
    new THREE.MeshBasicMaterial({color:0xff00ff})
   );
-  bulb.position.set(x-side*.8,3.7,-i*9);
+  bulb.position.set(side*6.8,4.65,-i*15);
   scene.add(bulb);
-
-  const glow=new THREE.PointLight(0xff00ff,2.5,12);
-  glow.position.copy(bulb.position);
-  scene.add(glow);
-
-  lamps.push({pole,arm,bulb,glow});
+  lamps.push(bulb);
  }
 }
 
-// =================================
-// REALISTIC-STYLE SMOOTH CAR
-// =================================
-
-function createCar(color){
+// Mashina yaratish
+function makeCar(color=0xff2020){
  const car=new THREE.Group();
+ const paint=new THREE.MeshStandardMaterial({color,metalness:.45,roughness:.25});
 
- const paint=new THREE.MeshPhysicalMaterial({
-  color,
-  metalness:.75,
-  roughness:.2,
-  clearcoat:1,
-  clearcoatRoughness:.12
- });
+ const body=new THREE.Mesh(new THREE.BoxGeometry(1.8,.65,3.4),paint);
+ body.position.y=.65;
+ car.add(body);
 
- const glass=new THREE.MeshPhysicalMaterial({
-  color:0x102b40,
-  metalness:.4,
-  roughness:.1,
-  transmission:.08,
-  clearcoat:1
- });
+ const cabin=new THREE.Mesh(new THREE.BoxGeometry(1.45,.65,1.65),glassMat);
+ cabin.position.set(0,1.2,-.15);
+ car.add(cabin);
 
- function sphere(parent,x,y,z,sx,sy,sz,mat){
-  const obj=new THREE.Mesh(
-   new THREE.SphereGeometry(1,40,32),mat
-  );
-  obj.position.set(x,y,z);
-  obj.scale.set(sx,sy,sz);
-  obj.castShadow=true;
-  obj.receiveShadow=true;
-  parent.add(obj);
-  return obj;
+ for(const z of [-1.8,1.8]){
+  const bumper=new THREE.Mesh(new THREE.BoxGeometry(1.9,.2,.18),darkMat);
+  bumper.position.set(0,.45,z);
+  car.add(bumper);
  }
 
- // Main smooth body
- sphere(car,0,.66,0,.91,.32,1.72,paint);
-
- // Hood
- sphere(car,0,.73,.96,.84,.25,.78,paint);
-
- // Rear body
- sphere(car,0,.73,-1.1,.88,.27,.65,paint);
-
- // Roof
- sphere(car,0,1.05,-.18,.69,.42,.86,paint);
-
- // Windows
- sphere(car,0,1.12,-.17,.66,.32,.79,glass);
-
- // Front bumper
- sphere(car,0,.48,1.58,.82,.14,.18,paint);
-
- // Wheels and rims
- for(const x of [-.89,.89]){
-  for(const z of [-1.05,1.05]){
-   const wheelGroup=new THREE.Group();
-   wheelGroup.position.set(x,.39,z);
-   car.add(wheelGroup);
-
-   const tire=new THREE.Mesh(
-    new THREE.CylinderGeometry(.38,.38,.22,40),
-    material(0x090b10,0,.9)
-   );
-   tire.rotation.z=Math.PI/2;
-   wheelGroup.add(tire);
-
-   const rim=new THREE.Mesh(
-    new THREE.CylinderGeometry(.21,.21,.235,32),
-    material(0x9ca9b8,.9,.2)
-   );
-   rim.rotation.z=Math.PI/2;
-   wheelGroup.add(rim);
-
-   const center=new THREE.Mesh(
-    new THREE.CylinderGeometry(.07,.07,.25,20),
-    material(0x151b26,.8,.3)
-   );
-   center.rotation.z=Math.PI/2;
-   wheelGroup.add(center);
+ for(const x of [-.96,.96]){
+  for(const z of [-1.1,1.1]){
+   const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.38,.38,.25,12),wheelMat);
+   wheel.rotation.z=Math.PI/2;
+   wheel.position.set(x,.4,z);
+   car.add(wheel);
   }
  }
 
- // Headlights
- for(const x of [-.55,.55]){
-  const lamp=new THREE.Mesh(
-   new THREE.BoxGeometry(.32,.12,.08),
-   new THREE.MeshBasicMaterial({color:0xe5faff})
-  );
-  lamp.position.set(x,.71,1.69);
-  car.add(lamp);
-
-  const beam=new THREE.PointLight(0x8edfff,1.4,13);
-  beam.position.set(x,.8,2);
-  car.add(beam);
- }
-
- // Rear lights
+ const lightMat=new THREE.MeshBasicMaterial({color:0xffffcc});
  for(const x of [-.58,.58]){
-  const tail=new THREE.Mesh(
-   new THREE.BoxGeometry(.32,.1,.08),
-   new THREE.MeshBasicMaterial({color:0xff102f})
-  );
-  tail.position.set(x,.72,-1.69);
-  car.add(tail);
+  const light=new THREE.Mesh(new THREE.BoxGeometry(.35,.18,.08),lightMat);
+  light.position.set(x,.75,-1.73);
+  car.add(light);
  }
-
  return car;
 }
 
-// PLAYER CAR
-const player=createCar(0x087bff);
+// O'yinchi mashinasi
+const player=makeCar(0xff2020);
 player.position.set(0,0,4);
 scene.add(player);
 
-// ENEMIES
+// Yo'ldagi mashinalar
 const enemies=[];
-const enemyColors=[
- 0xff2020,0xffc400,0x9b45ff,
- 0xffffff,0x14d99a,0xff6a00
-];
+const enemyColors=[0x168cff,0xffd000,0x21cc70,0xaa44ff,0xff7700];
 
 function spawnEnemy(){
- const lanes=[-4.2,0,4.2];
- const car=createCar(
-  enemyColors[Math.floor(Math.random()*enemyColors.length)]
- );
- car.scale.setScalar(.88);
- car.position.set(
-  lanes[Math.floor(Math.random()*lanes.length)],
-  0,-145
- );
- scene.add(car);
- enemies.push(car);
+ if(enemies.length>=5)return;
+
+ const e=makeCar(enemyColors[Math.floor(Math.random()*enemyColors.length)]);
+ e.position.set([-3.5,0,3.5][Math.floor(Math.random()*3)],0,-100-Math.random()*45);
+ scene.add(e);
+ enemies.push(e);
 }
 
-// =================================
-// GAME STATE
-// =================================
+// HAVODAGI TO'RTBURCHAK TO'SIQLAR
+const airObstacles=[];
+const obstacleGeometry=new THREE.BoxGeometry(2.4,1.5,1.3);
+const obstacleMaterials=[
+ new THREE.MeshStandardMaterial({color:0xff2525,emissive:0x660000}),
+ new THREE.MeshStandardMaterial({color:0xff9900,emissive:0x552200}),
+ new THREE.MeshStandardMaterial({color:0xff00ff,emissive:0x550055})
+];
 
-let running=false;
+function spawnAirObstacle(){
+ if(airObstacles.length>=6)return;
+
+ const mat=obstacleMaterials[Math.floor(Math.random()*obstacleMaterials.length)];
+ const obstacle=new THREE.Mesh(obstacleGeometry,mat);
+
+ obstacle.position.set(
+  (Math.random()-.5)*8,
+  3+Math.random()*5,
+  -100-Math.random()*35
+ );
+
+ scene.add(obstacle);
+ airObstacles.push(obstacle);
+}
+
+// O'yin holati
 let speed=0;
 let distance=0;
-let jumpTime=0;
+let record=Number(localStorage.getItem("racingRecord")||0);
+let steer=0;
+let jumping=false;
+let flying=false;
 let flyTime=0;
+let jumpVelocity=0;
 let lastSpace=0;
+let gameOver=false;
+let gas=false,brake=false,left=false,right=false;
 let spawnTimer=0;
-let steering=0;
+let airSpawnTimer=0;
+let messageTimer=0;
 
-let best=Number(localStorage.getItem("superCarBest")||0);
+const speedEl=document.getElementById("speed");
+const distanceEl=document.getElementById("distance");
+const recordEl=document.getElementById("record");
+const messageEl=document.getElementById("message");
+recordEl.textContent=Math.floor(record);
 
-document.getElementById("record").textContent=best+" M";
-
-const speedUI=document.getElementById("speed");
-const distanceUI=document.getElementById("distance");
-const flyUI=document.getElementById("flyStatus");
-const flyTimeUI=document.getElementById("flyTime");
-const overlay=document.getElementById("overlay");
-
-const keys={
- left:false,right:false,gas:false,brake:false
-};
-
-// =================================
-// CONTROL BUTTONS
-// =================================
-
-function holdButton(id,key){
- const button=document.getElementById(id);
-
- button.addEventListener("pointerdown",e=>{
-  e.preventDefault();
-  keys[key]=true;
-  button.setPointerCapture(e.pointerId);
- });
-
- ["pointerup","pointercancel","lostpointercapture"].forEach(ev=>{
-  button.addEventListener(ev,()=>keys[key]=false);
- });
+function showMessage(t){
+ messageEl.textContent=t;
+ messageTimer=1.5;
 }
 
-holdButton("left","left");
-holdButton("right","right");
-holdButton("gas","gas");
-holdButton("brake","brake");
+// Klaviatura
+const keys={};
 
-// KEYBOARD
-window.addEventListener("keydown",e=>{
- const k=e.key.toLowerCase();
+addEventListener("keydown",e=>{
+ keys[e.code]=true;
 
- if(["arrowleft","arrowright","arrowup","arrowdown"," "].includes(k))
+ if(e.code==="Space"){
   e.preventDefault();
+  if(!e.repeat)spaceAction();
+ }
 
- if(k==="arrowleft"||k==="a")keys.left=true;
- if(k==="arrowright"||k==="d")keys.right=true;
- if(k==="arrowup"||k==="w")keys.gas=true;
- if(k==="arrowdown"||k==="s")keys.brake=true;
-
- if(e.code==="Space"&&!e.repeat)specialMove();
+ if(e.code.startsWith("Arrow"))e.preventDefault();
 });
 
-window.addEventListener("keyup",e=>{
- const k=e.key.toLowerCase();
+addEventListener("keyup",e=>keys[e.code]=false);
 
- if(k==="arrowleft"||k==="a")keys.left=false;
- if(k==="arrowright"||k==="d")keys.right=false;
- if(k==="arrowup"||k==="w")keys.gas=false;
- if(k==="arrowdown"||k==="s")keys.brake=false;
-});
-
-// =================================
-// JUMP AND MAXFLY
-// =================================
-
-function specialMove(){
- if(!running)return;
-
+// Sakrash va uchish
+function spaceAction(){
  const now=performance.now();
 
- if(now-lastSpace<380){
+ if(now-lastSpace<350){
+  flying=true;
   flyTime=60;
-  jumpTime=0;
-  player.position.y=5;
+  jumping=false;
+  jumpVelocity=0;
+  player.position.y=5.5;
+  showMessage("UCHISH BOSHLANDI! 60 SEC");
  }else{
-  if(flyTime<=0){
-   jumpTime=1.1;
+  if(!flying&&!jumping){
+   jumping=true;
+   jumpVelocity=10;
   }
  }
 
  lastSpace=now;
 }
 
-document.getElementById("jump")
-.addEventListener("pointerdown",e=>{
- e.preventDefault();
- specialMove();
-});
+// Telefon tugmalari
+function bindButton(id,down,up){
+ const el=document.getElementById(id);
 
-// =================================
-// GAME OVER
-// =================================
+ el.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  down();
+ });
 
-function endGame(){
- if(!running)return;
+ el.addEventListener("pointerup",e=>{
+  e.preventDefault();
+  up();
+ });
 
- running=false;
-
- const score=Math.floor(distance);
-
- if(score>best){
-  best=score;
-  localStorage.setItem("superCarBest",best);
- }
-
- document.getElementById("record").textContent=best+" M";
-
- overlay.innerHTML=`
- <div class="menu">
-  <h1>💥 GAME OVER</h1>
-  <p>
-   Bosib o'tilgan masofa: <b>${score} M</b><br>
-   Eng yaxshi rekord: <b>${best} M</b>
-  </p>
-  <button class="mainbtn" id="restart">QAYTA BOSHLASH</button>
- </div>`;
-
- overlay.classList.remove("hidden");
- document.getElementById("restart").onclick=startGame;
+ el.addEventListener("pointerleave",up);
+ el.addEventListener("pointercancel",up);
 }
 
-// =================================
-// START GAME
-// =================================
+bindButton("left",()=>left=true,()=>left=false);
+bindButton("right",()=>right=true,()=>right=false);
+bindButton("gas",()=>gas=true,()=>gas=false);
+bindButton("brake",()=>brake=true,()=>brake=false);
 
-function startGame(){
+document.getElementById("jump").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ spaceAction();
+});
+
+// Qayta boshlash
+function resetGame(){
+ speed=0;
+ distance=0;
+ gameOver=false;
+ player.position.set(0,0,4);
+ jumping=false;
+ flying=false;
+ flyTime=0;
+ jumpVelocity=0;
+
  enemies.forEach(e=>scene.remove(e));
  enemies.length=0;
 
- speed=0;
- distance=0;
- jumpTime=0;
- flyTime=0;
+ airObstacles.forEach(o=>scene.remove(o));
+ airObstacles.length=0;
+
  spawnTimer=0;
- steering=0;
- lastSpace=0;
-
- player.position.set(0,0,4);
- player.rotation.set(0,0,0);
-
- Object.keys(keys).forEach(k=>keys[k]=false);
-
- running=true;
- overlay.classList.add("hidden");
- flyUI.style.display="none";
-
- speedUI.textContent="0";
- distanceUI.textContent="0";
+ airSpawnTimer=0;
+ showMessage("YANGI BOSHLANDI!");
 }
 
-document.getElementById("start").onclick=startGame;
+// Asosiy o'yin sikli
+let previous=performance.now();
 
-// =================================
-// MAIN ANIMATION
-// =================================
-
-const clock=new THREE.Clock();
-let wheelRotation=0;
-
-function animate(){
+function animate(now){
  requestAnimationFrame(animate);
 
- const dt=Math.min(clock.getDelta(),.04);
- const time=performance.now()*.001;
+ const dt=Math.min((now-previous)/1000,.04);
+ previous=now;
 
- // RGB LIGHTS
- lamps.forEach((lamp,i)=>{
-  const hue=(time*.17+i*.075)%1;
-  const color=new THREE.Color().setHSL(hue,1,.6);
-  lamp.bulb.material.color.copy(color);
-  lamp.glow.color.copy(color);
- });
+ if(gameOver){
+  renderer.render(scene,camera);
+  return;
+ }
 
- if(running){
+ // Tezlanish va tormoz
+ const accelerating=gas||keys["ArrowUp"]||keys["KeyW"];
+ const braking=brake||keys["ArrowDown"]||keys["KeyS"];
 
-  // ACCELERATION
-  if(keys.gas){
-   speed=Math.min(speed+300*dt,1000);
-  }else{
-   speed=Math.max(speed-15*dt,0);
-  }
+ if(accelerating)speed+=300*dt;
+ else speed-=70*dt;
 
-  // VERY STRONG BRAKES
-  if(keys.brake){
-   speed=Math.max(speed-850*dt,0);
-  }
+ if(braking)speed-=850*dt;
+ speed=THREE.MathUtils.clamp(speed,0,1000);
 
-  // ROAD MOVEMENT
-  const movement=speed/3.6;
-  const roadSpeed=movement*.22;
+ // Burilish
+ const l=left||keys["ArrowLeft"]||keys["KeyA"];
+ const r=right||keys["ArrowRight"]||keys["KeyD"];
 
-  // STEERING
-  steering=0;
-  if(keys.left)steering=-1;
-  if(keys.right)steering=1;
+ steer=(r?1:0)-(l?1:0);
+ player.position.x+=steer*(3.5+speed*.004)*dt;
+ player.position.x=THREE.MathUtils.clamp(player.position.x,-4.6,4.6);
+ player.rotation.z=THREE.MathUtils.lerp(player.rotation.z,-steer*.13,.15);
 
-  player.position.x+=steering*(2.7+movement*.012)*dt;
-  player.position.x=THREE.MathUtils.clamp(
-   player.position.x,-4.8,4.8
-  );
+ // Sakrash
+ if(jumping&&!flying){
+  player.position.y+=jumpVelocity*dt;
+  jumpVelocity-=23*dt;
 
-  player.rotation.z=THREE.MathUtils.lerp(
-   player.rotation.z,-steering*.22,dt*6
-  );
-
-  // JUMP
-  if(flyTime>0){
-   flyTime=Math.max(0,flyTime-dt);
-   player.position.y=6;
-   flyUI.style.display="block";
-   flyTimeUI.textContent=Math.ceil(flyTime);
-  }
-  else if(jumpTime>0){
-   jumpTime=Math.max(0,jumpTime-dt);
-   player.position.y=Math.sin(
-    (1.1-jumpTime)/1.1*Math.PI
-   )*3.2;
-   flyUI.style.display="none";
-  }
-  else{
+  if(player.position.y<=0){
    player.position.y=0;
-   flyUI.style.display="none";
+   jumping=false;
+   jumpVelocity=0;
+  }
+ }
+
+ // Uchish
+ if(flying){
+  flyTime-=dt;
+  player.position.y=5.5+Math.sin(now*.004)*.35;
+
+  if(flyTime<=0){
+   flying=false;
+   player.position.y=0;
+   showMessage("UCHISH TUGADI");
+  }
+ }
+
+ const movement=(speed/3.6)*.5*dt;
+
+ // Yo'l chiziqlari harakati
+ for(const m of laneMarks){
+  m.position.z+=movement;
+  if(m.position.z>8)m.position.z-=280;
+ }
+
+ // Chiroqlar harakati
+ for(const lamp of lamps){
+  lamp.position.z+=movement;
+  if(lamp.position.z>10)lamp.position.z-=270;
+  lamp.material.color.setHSL((now*.0002+lamp.position.z*.003)%1,1,.55);
+ }
+
+ // Yo'ldagi mashinalar
+ spawnTimer+=dt;
+
+ if(spawnTimer>1.15&&speed>80){
+  spawnEnemy();
+  spawnTimer=0;
+ }
+
+ for(let i=enemies.length-1;i>=0;i--){
+  const e=enemies[i];
+  e.position.z+=movement * 1;
+
+  if(e.position.z>13){
+   scene.remove(e);
+   enemies.splice(i,1);
+   continue;
   }
 
-  // ROAD LINES
-  marks.forEach(m=>{
-   m.position.z+=roadSpeed*dt;
-   if(m.position.z>12)m.position.z-=280;
-  });
+  const dx=Math.abs(e.position.x-player.position.x);
+  const dz=Math.abs(e.position.z-player.position.z);
 
-  // STREET LIGHTS
-  lamps.forEach(o=>{
-   o.pole.position.z+=roadSpeed*dt;
-   o.arm.position.z+=roadSpeed*dt;
-   o.bulb.position.z+=roadSpeed*dt;
-   o.glow.position.z+=roadSpeed*dt;
+  if(dx<1.5&&dz<2.4&&player.position.y<1.3&&!flying){
+   gameOver=true;
+   speed=0;
+   showMessage("TO'QNASHUV! — R NI BOSING");
+  }
+ }
 
-   if(o.pole.position.z>15){
-    o.pole.position.z-=315;
-    o.arm.position.z-=315;
-    o.bulb.position.z-=315;
-    o.glow.position.z-=315;
-   }
-  });
+ // HAVODAGI TO'SIQLARNI CHIQARISH
+ if(flying){
+  airSpawnTimer+=dt;
 
-  // ENEMY SPAWN
-  spawnTimer+=dt;
+  if(airSpawnTimer>1.5){
+   spawnAirObstacle();
+   airSpawnTimer=0;
+  }
+ }
 
-  if(spawnTimer>Math.max(.55,2-speed/700)){
-   spawnEnemy();
-   spawnTimer=0;
+ // Havodagi to'siqlar harakati va to'qnashuv
+ for(let i=airObstacles.length-1;i>=0;i--){
+  const o=airObstacles[i];
+
+  o.position.z+=movement;
+
+  // To'siq aylanishi
+  o.rotation.z+=dt*.15;
+
+  // Ekrandan chiqsa o'chirish
+  if(o.position.z>15){
+   scene.remove(o);
+   airObstacles.splice(i,1);
+   continue;
   }
 
-  // ENEMY MOVEMENT
-  for(let i=enemies.length-1;i>=0;i--){
-   const enemy=enemies[i];
+  // Faqat uchish rejimida havo to'sig'i bilan to'qnashuv
+  const dx=Math.abs(o.position.x-player.position.x);
+  const dy=Math.abs(o.position.y-player.position.y);
+  const dz=Math.abs(o.position.z-player.position.z);
 
-   enemy.position.z+=roadSpeed*dt;
-
-   // COLLISION
-   const safeFromCollision=
-    player.position.y>1.3;
-
-   if(!safeFromCollision&&
-      Math.abs(enemy.position.x-player.position.x)<1.55&&
-      Math.abs(enemy.position.z-player.position.z)<2.3){
-    endGame();
-    break;
-   }
-
-   if(enemy.position.z>16){
-    scene.remove(enemy);
-    enemies.splice(i,1);
-   }
+  if(flying&&dx<1.8&&dy<1.5&&dz<2){
+   gameOver=true;
+   speed=0;
+   showMessage("HAVODAGI TO'SIQ! — R NI BOSING");
   }
+ }
 
-  // DISTANCE
-  distance+=movement*dt*.35;
+ // Masofa va rekord
+ distance+=(speed/3.6)*dt*.35;
+ const d=Math.floor(distance);
 
-  speedUI.textContent=Math.floor(speed);
-  distanceUI.textContent=Math.floor(distance);
+ if(d>record){
+  record=d;
+  localStorage.setItem("racingRecord",record);
+ }
 
-  // WHEEL-LIKE CAR BODY ANIMATION
-  player.position.y+=Math.sin(time*12)*.008;
+ speedEl.textContent=Math.floor(speed);
+ distanceEl.textContent=d;
+ recordEl.textContent=record;
 
-  // CAMERA FOLLOW
-  camera.position.x=THREE.MathUtils.lerp(
-   camera.position.x,player.position.x*.35,dt*3
-  );
-  camera.position.y=THREE.MathUtils.lerp(
-   camera.position.y,6+player.position.y*.15,dt*3
-  );
+ // Kamera
+ camera.position.x=THREE.MathUtils.lerp(camera.position.x,player.position.x*.45,.06);
+ camera.position.y=THREE.MathUtils.lerp(camera.position.y,5.5+player.position.y*.3,.06);
+ camera.lookAt(player.position.x*.3,1.3,-5);
 
-  camera.lookAt(player.position.x*.25,1.1,0);
+ if(messageTimer>0){
+  messageTimer-=dt;
+  if(messageTimer<=0)messageEl.textContent="";
  }
 
  renderer.render(scene,camera);
 }
 
-animate();
+requestAnimationFrame(animate);
 
-// =================================
-// RESIZE
-// =================================
+// R tugmasi bilan qayta boshlash
+addEventListener("keydown",e=>{
+ if(e.code==="KeyR"&&gameOver)resetGame();
+});
 
-window.addEventListener("resize",()=>{
+// Oyna o'lchami
+addEventListener("resize",()=>{
  camera.aspect=innerWidth/innerHeight;
  camera.updateProjectionMatrix();
  renderer.setSize(innerWidth,innerHeight);
+ renderer.setPixelRatio(Math.min(devicePixelRatio,1.2));
 });
+
+showMessage("GAZNI BOSIB BOSHLANG!");
 </script>
 </body>
 </html>
